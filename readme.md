@@ -1,17 +1,33 @@
-User Agent:
+## Opis agentów
+####User Agent:
 - user może wgrywac dane testowe
  
-Data Agent:
+#### Data Agent:
 - dzieli dane na podobne zbiory pomiędzy węzłami KNN
 - jego zadaniem jest ustalenie optymalnej liczby agentów KNN
 - rozdystrybuowanie pomiędzy węzłami KNN
 
-KNN Agent:
+#### KNN Agent:
 - bierze dane, robi KNN i przekazuje wynikową klasę (z wagą) do Validation agenta
 - narazie nic się nie wywala, obsługa błędów w późniejszym etapie
 
-Validation Agent:
+#### Validation Agent:
 - Na podstawie wyników z KNN z wagami dochodzi do licytacji, czyli zlicza te same klasy
 - przekazuje wynik do User Agenta
 
 Basic wersja: Dane trenujące, z pliku. Ewentualnie, może, jak będzie się nam nudziło to baze sie zrobi
+
+### Serwer xmpp - Prosody
+
+#### Konfiguracja
+- conf - katalog zawiera certyfikaty ssl oraz konfugurację serwera 
+- prosody_modules - katalog z dodatkowymi modułami (admin, listusers)
+
+#### Uruchamianie
+
+Serwer uruchamiamy za pomocą komendy `docker-compose up -d`
+
+Aby Program.py działał trzeba wejść do kontenera i stworzyć użytkownika za pomocą komendy:
+`prosodyctl addusr user@localhost`
+
+Konsola administratora jest dostępna pod `localhost:5280/admin`

@@ -1,10 +1,34 @@
-from spade import agent
+import time
+import asyncio
+from spade.agent import Agent
+from spade.behaviour import CyclicBehaviour
 
-class DummyAgent(agent.Agent):
+
+class DummyAgent(Agent):
+    class MyBehav(CyclicBehaviour):
+        async def on_start(self):
+            print("Starting behaviour . . .")
+            self.counter = 0
+
+        async def run(self):
+            print("Counter: {}".format(self.counter))
+            self.counter += 1
+            await asyncio.sleep(1)
+
     async def setup(self):
-        print("Hello World! I'm agent {}".format(str(self.jid)))
+        print("Agent starting . . .")
+        b = self.MyBehav()
+        self.add_behaviour(b)
 
-dummy = DummyAgent("marcin@localhost", "marcin")
-dummy.start()
 
-dummy.stop()
+if __name__ == "__main__":
+    dummy = DummyAgent("user@localhost", "user")
+    dummy.start()
+
+    print("Wait until user interrupts with ctrl+C")
+    while True:
+        try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            break
+    dummy.stop()
