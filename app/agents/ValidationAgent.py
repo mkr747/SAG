@@ -2,8 +2,8 @@ import itertools
 import datetime
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
-from ..handlers.MessageHandler import MessageHandler
-from ..models.KnnResponse import KnnResponse
+from handlers.MessageHandler import MessageHandler
+from models.KnnResponse import KnnResponse
 from operator import itemgetter
 
 class ValidationAgent(Agent):

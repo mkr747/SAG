@@ -4,11 +4,11 @@ from spade.message import Message
 
 class MessageHandler:
     @staticmethod
-    def decodeMessageToObject(self, messageJson):
+    def decodeMessageToObject(messageJson):
         return namedtuple('X', messageJson.keys())(*messageJson.values())
 
     @staticmethod
-    def createMessage(self, receiverJid, performative, content):
+    def createMessage(receiverJid, performative, content):
         msg = Message(to = receiverJid)
         msg.set_metadata("performative", performative)
         msg.set_metadata("language", "json")
