@@ -4,6 +4,7 @@ from spade.agent import Agent
 from spade.behaviour import OneShotBehaviour
 from spade.message import Message
 from spade.template import Template
+from spade import quit_spade
 from mlxtend.preprocessing import minmax_scaling
 
 from app.handlers.MessageHandler import MessageHandler
@@ -75,10 +76,12 @@ if __name__ == "__main__":
     data_agent = DataAgent("sender@localhost", "user")
     data_agent.start()
 
-    while data_agent.is_alive():
+    i = 0
+    while i < 10:
         try:
             time.sleep(1)
+            i += 1
         except KeyboardInterrupt:
-            data_agent.stop()
             break
+    quit_spade()
     print("Agents finished")
