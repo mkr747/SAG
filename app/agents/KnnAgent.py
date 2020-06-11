@@ -1,7 +1,7 @@
-import math 
+import math
 import datetime
 import pandas as pd
-from app.services.Logger import Logger
+from services.Logger import Logger
 from collections import Counter
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour, OneShotBehaviour
@@ -31,14 +31,18 @@ class KnnAgent(Agent):
             self.knnService = KnnService()
             self.messageService = MessageService()
             self.logger = logger
+            print('constructor KnnBehav')
+
+        async def on_start(self):
+            print('DUPA')
         
         async def run(self):
-            self.presence.on_subscribe = self.on_subscribe
-            self.presence.on_subscribed = self.on_subscribed
+            print('run')
             msg = await self.receive(timeout=None)
+            print(msg)
             if msg is None:
                 return
-            
+            print(msg)
             if msg and msg.metadata[PhaseTag] == Bidding:
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 self.knnService.addData(row)
@@ -66,6 +70,7 @@ class KnnAgent(Agent):
     async def setup(self):
         knn_behav = self.KnnBehav(self.number, self.creatorJid, self.logger)
         template = self.knn_template()
+        self.behav1 = knn_behav
         self.add_behaviour(knn_behav, template)
         self.logger.agent_started()
 
@@ -74,5 +79,7 @@ class KnnAgent(Agent):
         template.to = f'{self.jid}'
         template.sender = f'{self.creatorJid}'
         template.thread = f'{self.number}'
-        
+        template.metadata={'language': 'json'}
+        print(template)
+
         return template

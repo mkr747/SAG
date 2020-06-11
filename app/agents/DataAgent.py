@@ -7,11 +7,11 @@ from spade.template import Template
 from spade import quit_spade
 from mlxtend.preprocessing import minmax_scaling
 
-from app.services.MessageService import MessageService
-from app.agents.KnnAgent import KnnAgent
-from app.services.Endpoints import Endpoints
-from app.services.Logger import Logger
-from app.services.KnnService import KnnService
+from services.MessageService import MessageService
+from agents.KnnAgent import KnnAgent
+from services.Endpoints import Endpoints
+from services.Logger import Logger
+from services.KnnService import KnnService
 Querying = "Querying"
 Bidding = "Bidding"
 PhaseTag = "phase"
@@ -47,6 +47,8 @@ class DataAgent(Agent):
             print(f'[{datetime.datetime.now().time()}]DataAgent: Data agent run')
             self.__get_data("..\\data\\winequality-red.csv")
             await self.__split_dataset()
+
+        async def on_end(self):
             await self.agent.stop()
 
         def __get_data(self, filepath):
@@ -69,22 +71,21 @@ class DataAgent(Agent):
                         await self.__wait_for_center(key)
                         assigned = True
 
-                agent_created = False
                 if not assigned:
                     self.agent_count += 1
-                    print(f'new one with key {self.agent_count}')
-                    agent_created = await self.__create_new_agent(self.agent_count)
+                    self.logger
+                    await self.__create_new_agent(self.agent_count, row)
 
-                if agent_created:
-                    await self.__send_row(self.agent_count, row)
-                    await self.__wait_for_center(self.agent_count)
-
-        async def __create_new_agent(self, number):
+        async def __create_new_agent(self, number, row):
             agent = KnnAgent(Endpoints.KAGENT, Endpoints.PASS, number, Endpoints.DAGENT)
             await agent.start()
             self.logger.agent_created(f'Knn{number}Agent')
+            await self.__send_row(number, row)
+            self.logger.custom_message(f'Data sent: {row}')
             self.knn_agents.setdefault(number, { "Agent": agent, Center: 0 })
-            print(self.knn_agents)
+            await self.__wait_for_center(number)
+            self.logger.custom_message(f'Ceneter provided for: Knn{number}; Center = {self.knn_agents[number]}')
+
             return True
 
         async def __wait_for_center(self, number):
@@ -92,9 +93,11 @@ class DataAgent(Agent):
                 ccResponse = await self.receive(timeout=None)
                 if ccResponse is None:
                     continue
+                
+                print(ccResponse)
                 if(ccResponse.metadata[KnnId] == f'{number}'):
+                    print(f'AAAAAAAAAAAAAAAAAAAAAAAAAA: {ccResponse.body}')
                     self.knn_agents[number][Center] = ccResponse.body
-                    break
 
         async def __send_row(self, agent_index, row):
             msg = self.messageService.create_message_from_data_frame(Endpoints.KAGENT, Bidding, row.to_json(), agent_index)
@@ -107,12 +110,14 @@ class DataAgent(Agent):
 
     async def setup(self):
         b = self.BiddingBehav(self.threshold, self.logger)
-        self.add_behaviour(b, self.data_template())
+        template = self.data_template()
+        self.add_behaviour(b, template)
         self.logger.agent_started()
 
     def data_template(self):
         template = Template()
         template.to = f'{self.jid}'
         template.sender = f'{Endpoints.KAGENT}'
-        template.metadata = {'phase': 'center', 'language': 'json'}
+        template.metadata={'phase': 'center', 'language': 'json'}
+        print(template)
         return template

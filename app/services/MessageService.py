@@ -19,6 +19,7 @@ class MessageService:
         msg.set_metadata("language", "json")
         msg.thread = f'{thread}'
         msg.body = json.dumps(content)
+        print(f'Thaths the message: {msg}')
         
         return msg
 

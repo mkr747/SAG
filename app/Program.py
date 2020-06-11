@@ -1,5 +1,6 @@
 import time
 from agents.UserAgent import UserAgent
+from spade import quit_spade
 
 if __name__ == "__main__":
     user = UserAgent("user@localhost", "user", dataEndpoint = "data@localhost")
@@ -14,3 +15,4 @@ if __name__ == "__main__":
             break
     
     user.stop()
+    quit_spade()
