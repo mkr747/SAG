@@ -1,7 +1,7 @@
 import math 
 import datetime
 import pandas as pd
-from services.Logger import Logger
+from app.services.Logger import Logger
 from collections import Counter
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour, OneShotBehaviour
@@ -36,22 +36,21 @@ class KnnAgent(Agent):
             self.presence.on_subscribe = self.on_subscribe
             self.presence.on_subscribed = self.on_subscribed
             msg = await self.receive(timeout=None)
-            if(msg is None):
+            if msg is None:
                 return
             
-            if(msg and msg.metadata[PhaseTag] == Bidding):
-                row = self.messageService.decode_message_to_dict(messageJson=msg.body)
+            if msg and msg.metadata[PhaseTag] == Bidding:
+                row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 self.knnService.addData(row)
                 cc = self.knnService.CalculateCenter()
-                ccResponse = self.messageService.createMessage(self.creatorJid, "center", cc)
-                ccResponse.set_metadata(KnnId, f'{self.number}')
+                ccResponse = self.messageService.create_message(self.creatorJid, "center", cc, self.number)
                 await self.send(ccResponse)
                 return
 
-            if(msg and msg.metadata[PhaseTag] == Querying):
-                row = self.messageService.decode_message_to_dict(messageJson=msg.body)
+            if msg and msg.metadata[PhaseTag] == Querying:
+                row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 [most_common, num_most_common] = self.knnService.Knn(row)
-                qResponse = self.messageService.createMessage(Endpoints.VAGENT, "validate", [most_common, num_most_common])
+                qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate", [most_common, num_most_common])
                 
                 await self.send(qResponse)
                 return
@@ -65,16 +64,15 @@ class KnnAgent(Agent):
             self.logger.agent_subscribed(jid)
 
     async def setup(self):
-        knnBehav = self.KnnBehav(self.number, self.creatorJid, self.logger)
-        template = self.knnTemplate(self.number, self.creatorJid)
-        self.add_behaviour(knnBehav, template)
+        knn_behav = self.KnnBehav(self.number, self.creatorJid, self.logger)
+        template = self.knn_template()
+        self.add_behaviour(knn_behav, template)
         self.logger.agent_started()
-        
 
-    def knnTemplate(self, number, creatorJid):
+    def knn_template(self):
         template = Template()
         template.to = f'{self.jid}'
         template.sender = f'{self.creatorJid}'
-        template.thread = f'{number}'
+        template.thread = f'{self.number}'
         
         return template

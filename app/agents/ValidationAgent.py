@@ -32,14 +32,14 @@ class ValidationAgent(Agent):
 
         async def on_end(self):
             max(self.results, key=lambda knn: knn.weight)
-            msg = self.messageService.createMessage(self.userEndpoint, "inform", "content")
+            msg = self.messageService.create_message(self.userEndpoint, "inform", "content")
             await self.send(msg)
             await self.agent.stop()
 
 
         async def run(self):
             msg = await self.receive(timeout=None)
-            knnResult = self.messageService.decodeMessageToObject(msg)
+            knnResult = self.messageService.decode_message_to_object(msg)
             self.knnResponse.append(knnResult)
             self.countResults()
 

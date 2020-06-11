@@ -5,25 +5,26 @@ from spade.message import Message
 
 class MessageService:
     @staticmethod
-    def decodeMessageToObject(messageJson):
-        return namedtuple('X', messageJson.keys())(*messageJson.values())
+    def decode_message_to_object(message_json):
+        return namedtuple('X', message_json.keys())(*message_json.values())
 
     @staticmethod
-    def decode_message_to_dict(messageJson):
-        return json.loads(messageJson)
+    def decode_message_to_dict(message_json):
+        return json.loads(message_json)
 
     @staticmethod
-    def createMessage(receiverJid, phase, content):
-        msg = Message(to=receiverJid)
+    def create_message(receiver_jid, phase, content, thread='None'):
+        msg = Message(to=receiver_jid)
         msg.set_metadata("phase", phase)
         msg.set_metadata("language", "json")
+        msg.thread = f'{thread}'
         msg.body = json.dumps(content)
         
         return msg
 
     @staticmethod
-    def create_message_from_data_frame(receiverJid, phase, content, thread='None'):
-        msg = Message(to=receiverJid)
+    def create_message_from_data_frame(receiver_jid, phase, content, thread='None'):
+        msg = Message(to=receiver_jid)
         msg.set_metadata("phase", phase)
         msg.set_metadata("language", "json")
         msg.thread = f'{thread}'

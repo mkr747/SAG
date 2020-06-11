@@ -34,7 +34,8 @@ class KnnService:
         print(f'Center: {center}')
         return center
 
-    def GetEuclidesMeasure(self, data1, data2):
+    @staticmethod
+    def GetEuclidesMeasure(data1, data2):
         data1Rows = len(data1)
         data2Rows = len(data2)
 
