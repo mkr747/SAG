@@ -6,8 +6,8 @@ class KnnService:
     def __init__(self):
         self.data = pd.DataFrame()
 
-    def addData(self, query):
-        self.data.append(pd.Series(query), ignore_index=True)
+    def addData(self, row):
+        self.data = self.data.append(row, ignore_index=True)
 
     def clean(self):
         self.data = pd.DataFrame()
@@ -15,12 +15,13 @@ class KnnService:
     def CalculateCenter(self):
         center = []
         rowNumber = 0
-        for row in self.data.iterrows():
+        for index, row in self.data.iterrows():
+            row = row.iloc[:-1]
             columnNumber = 0
-            for element in row:   
-                if rowNumber>0:                  
+            for element in row:
+                if rowNumber > 0:
                     center[columnNumber] = center[columnNumber] + element
-                else :
+                else:
                     center.append(element)
                 columnNumber = columnNumber + 1
             rowNumber = rowNumber + 1

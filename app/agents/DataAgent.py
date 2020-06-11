@@ -25,6 +25,7 @@ class DataAgent(Agent):
             self.raw_data = None
             self.data = None
             self.scaled_data = None
+            self.scaled_data_with_labels = None
             self.knn_agents = {}
             self.agent_count = 0
             self.threshhold = threshhold
@@ -53,6 +54,8 @@ class DataAgent(Agent):
                 self.labels = self.raw_data[self.raw_data.columns[-1]]
                 self.data = self.raw_data.iloc[:, :-1]
                 self.scaled_data = minmax_scaling(self.data, self.data.columns)
+                self.scaled_data_with_labels = self.scaled_data.copy()
+                self.scaled_data_with_labels['quality'] = self.labels
             except IOError as e:
                 self.logger.custom_message(f'Cannot open file. {e}')
 
@@ -64,7 +67,7 @@ class DataAgent(Agent):
                         await self.__send_row(key, row[0])
                         await self.__wait_for_center(key)
                         assigned = True
-                
+
                 if assigned == False:
                     self.agent_count += 1
                     print(f'new one with key {self.agent_count}')
@@ -85,8 +88,7 @@ class DataAgent(Agent):
                 self.knn_agents[number][Center] = ccResponse.body
 
         async def __send_row(self, agent_index, row_index):
-            msg = self.messageService.create_message_from_data_frame(Endpoints.KAGENT, Bidding, self.scaled_data.iloc[row_index].to_json(), agent_index)
-
+            msg = self.messageService.create_message_from_data_frame(Endpoints.KAGENT, Bidding, self.scaled_data_with_labels.iloc[row_index].to_json(), agent_index)
             await self.send(msg)
 
     def __init__(self, jid, password, threshhold, verify_security=False):
