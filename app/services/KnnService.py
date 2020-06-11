@@ -1,20 +1,21 @@
 import math
+import pandas as pd
 from collections import Counter
 
 class KnnService:
-    def __intit__(self):
-        self.data = []
+    def __init__(self):
+        self.data = pd.DataFrame()
 
     def addData(self, query):
-        self.data.append(query)
+        self.data.append(pd.Series(query), ignore_index=True)
 
     def clean(self):
-        self.data = []
+        self.data = pd.DataFrame()
 
     def CalculateCenter(self):
         center = []
         rowNumber = 0
-        for row in self.data:
+        for row in self.data.iterrows():
             columnNumber = 0
             for element in row:   
                 if rowNumber>0:                  
@@ -26,9 +27,10 @@ class KnnService:
 
         elementNumber = 0
         for element in center:
-            center[elementNumber] = center[elementNumber] / len(self.data)
+            center[elementNumber] = center[elementNumber] / self.data.size
             elementNumber = elementNumber + 1
-
+        
+        print(f'Center: {center}')
         return center
 
     def GetEuclidesMeasure(self, data1, data2):
@@ -51,7 +53,7 @@ class KnnService:
 
         rowNumber = 0
         euclidesMeasures = []
-        for row in self.data:
+        for row in self.data.iterrows():
             euclidesMeasures.append(self.GetEuclidesMeasure(row[:-1], query))
             rowNumber = rowNumber + 1
         print (euclidesMeasures)
@@ -63,8 +65,8 @@ class KnnService:
         for _ in range(0, k+1):
             indexOfMinValue = euclidesMeasures.index(min(euclidesMeasures))
             indexes.append(indexOfMinValue)
-            euclidesMeasures[indexOfMinValue] = max(euclidesMeasures) +1
-            classes.append(self.data[indexOfMinValue][len(self.data[0])-1])
+            euclidesMeasures[indexOfMinValue] = max(euclidesMeasures) + 1
+            classes.append(self.data.iloc[indexOfMinValue]['quality'])
 
         print (indexes)
         print (classes)

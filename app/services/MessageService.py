@@ -22,10 +22,11 @@ class MessageService:
         return msg
 
     @staticmethod
-    def create_message_from_data_frame(receiverJid, phase, content):
+    def create_message_from_data_frame(receiverJid, phase, content, thread='None'):
         msg = Message(to=receiverJid)
         msg.set_metadata("phase", phase)
         msg.set_metadata("language", "json")
+        msg.thread = f'{thread}'
         msg.body = content
 
         return msg

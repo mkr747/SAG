@@ -1,15 +1,21 @@
-import datetime
+import datetime, time
+from agents.DataAgent import DataAgent
+from services.Logger import Logger
+from services.Endpoints import Endpoints
 from spade.agent import Agent
-from spade.behaviour import CyclicBehaviour
+from spade.behaviour import OneShotBehaviour
 
 
 class UserAgent(Agent):
     def __init__(self, jid, password, dataEndpoint, verify_security=False):
-        self.dataEndpoint = dataEndpoint
         super().__init__(jid, password, verify_security)
+        self.dataEndpoint = dataEndpoint
+        self.logger = Logger("UserAgent")
 
-    class UserBehav(CyclicBehaviour):
-        def __init__(self, dataEndpoint):
+
+    class UserBehav(OneShotBehaviour):
+        def __init__(self, dataEndpoint, logger):
+            self.logger = logger
             self.dataEndpoint = dataEndpoint
             super().__init__()
 
@@ -17,9 +23,14 @@ class UserAgent(Agent):
             pass
 
         async def run(self):
-            pass
-
-    async def setup(self, dataEndpoint):
-        print(f"[{datetime.datetime.now().time()}]UserAgent: Agent started.")
-        behav = self.UserBehav(dataEndpoint = self.dataEndpoint)
+            self.logger.agent_run()
+            threshhold = 0.5
+            dataAgent = DataAgent(Endpoints.DAGENT, Endpoints.PASS, threshhold)
+            self.logger.agent_created("DataAgent")
+            await dataAgent.start()
+            
+    async def setup(self):
+        self.logger.agent_started()
+        behav = self.UserBehav(dataEndpoint = self.dataEndpoint, logger = self.logger)
         self.add_behaviour(behav)
+
