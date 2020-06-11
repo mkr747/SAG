@@ -2,14 +2,20 @@ import itertools
 import datetime
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
-from handlers.MessageHandler import MessageHandler
+from spade.message import Message
+from services.MessageService import MessageService
 from models.KnnResponse import KnnResponse
 from operator import itemgetter
 
 class ValidationAgent(Agent):
+    def __init__(self, jid, password, userEndpoint, verify_security=False):
+        self.userEndpoint = userEndpoint
+        super().__init__(jid, password, verify_security)
+
     class ListeningBehav(CyclicBehaviour):
         def __init__(self, userEndpoint):
             self.userEndpoint = userEndpoint
+            self.messageService = MessageService()
             self.knnResponse = []
             self.results = []
             super().__init__()
@@ -26,17 +32,18 @@ class ValidationAgent(Agent):
 
         async def on_end(self):
             max(self.results, key=lambda knn: knn.weight)
-            MessageHandler.createMessage(self.userEndpoint, "inform", "content")
+            msg = self.messageService.createMessage(self.userEndpoint, "inform", "content")
+            await self.send(msg)
             await self.agent.stop()
 
 
         async def run(self):
             msg = await self.receive(timeout=None)
-            knnResult = MessageHandler.decodeMessageToObject(msg)
+            knnResult = self.messageService.decodeMessageToObject(msg)
             self.knnResponse.append(knnResult)
             self.countResults()
 
-    async def setup(self, userEndpoint):
+    async def setup(self):
         print(f"ValidationAgent started at {datetime.datetime.now().time()}")
-        behav = self.ListeningBehav(userEndpoint = userEndpoint)
+        behav = self.ListeningBehav(userEndpoint = self.userEndpoint)
         self.add_behaviour(behav)
