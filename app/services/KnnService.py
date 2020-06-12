@@ -31,7 +31,6 @@ class KnnService:
             center[elementNumber] = center[elementNumber] / self.data.size
             elementNumber = elementNumber + 1
         
-        print(f'Center: {center}')
         return center
 
     @staticmethod
@@ -58,7 +57,6 @@ class KnnService:
         for row in self.data.iterrows():
             euclidesMeasures.append(self.GetEuclidesMeasure(row[:-1], query))
             rowNumber = rowNumber + 1
-        print (euclidesMeasures)
 
         indexes = []
         classes = []
@@ -70,10 +68,6 @@ class KnnService:
             euclidesMeasures[indexOfMinValue] = max(euclidesMeasures) + 1
             classes.append(self.data.iloc[indexOfMinValue]['quality'])
 
-        print (indexes)
-        print (classes)
-
         most_common,num_most_common = Counter(classes).most_common(1)[0]
-        print(most_common, num_most_common)
 
         return [most_common, num_most_common]

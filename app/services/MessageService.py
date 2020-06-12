@@ -17,10 +17,9 @@ class MessageService:
         msg = Message(to=receiver_jid)
         msg.set_metadata("phase", phase)
         msg.set_metadata("language", "json")
-        msg.thread = f'{thread}'
+        # msg.thread = f'{thread}'
         msg.body = json.dumps(content)
-        print(f'Thaths the message: {msg}')
-        
+
         return msg
 
     @staticmethod
@@ -28,7 +27,7 @@ class MessageService:
         msg = Message(to=receiver_jid)
         msg.set_metadata("phase", phase)
         msg.set_metadata("language", "json")
-        msg.thread = f'{thread}'
+        # msg.thread = f'{thread}'
         msg.body = content
 
         return msg

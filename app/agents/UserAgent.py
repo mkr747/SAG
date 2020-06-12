@@ -28,6 +28,7 @@ class UserAgent(Agent):
             dataAgent = DataAgent(Endpoints.DAGENT, Endpoints.PASS, threshhold)
             self.logger.agent_created("DataAgent")
             await dataAgent.start()
+            dataAgent.web.start(hostname="localhost", port="10001")
             
     async def setup(self):
         self.logger.agent_started()

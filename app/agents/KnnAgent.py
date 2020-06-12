@@ -15,6 +15,7 @@ Bidding = "Bidding"
 PhaseTag = "phase"
 KnnId = "number"
 
+
 class KnnAgent(Agent):
     def __init__(self, jid, password, number, creatorJid, verify_security=False):
         super().__init__(jid, password, verify_security)
@@ -31,31 +32,32 @@ class KnnAgent(Agent):
             self.knnService = KnnService()
             self.messageService = MessageService()
             self.logger = logger
-            print('constructor KnnBehav')
 
-        async def on_start(self):
-            print('DUPA')
-        
         async def run(self):
-            print('run')
-            msg = await self.receive(timeout=None)
-            print(msg)
+            # print(f'Knn run {self.number}')
+            msg = await self.receive(timeout=5)
             if msg is None:
                 return
-            print(msg)
+            if msg.body == 'DONE':
+                print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
+                await self.agent.stop()
+                return
+            # print(f'Knn {self.number} dostał {msg.body}')
             if msg and msg.metadata[PhaseTag] == Bidding:
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 self.knnService.addData(row)
                 cc = self.knnService.CalculateCenter()
                 ccResponse = self.messageService.create_message(self.creatorJid, "center", cc, self.number)
+                # print(f"Knn {self.number} chce wysłać {cc}")
                 await self.send(ccResponse)
                 return
 
             if msg and msg.metadata[PhaseTag] == Querying:
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 [most_common, num_most_common] = self.knnService.Knn(row)
-                qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate", [most_common, num_most_common])
-                
+                qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate",
+                                                               [most_common, num_most_common])
+
                 await self.send(qResponse)
                 return
 
@@ -71,15 +73,13 @@ class KnnAgent(Agent):
         knn_behav = self.KnnBehav(self.number, self.creatorJid, self.logger)
         template = self.knn_template()
         self.behav1 = knn_behav
-        self.add_behaviour(knn_behav, template)
+        self.add_behaviour(knn_behav)
         self.logger.agent_started()
 
     def knn_template(self):
         template = Template()
         template.to = f'{self.jid}'
         template.sender = f'{self.creatorJid}'
-        template.thread = f'{self.number}'
-        template.metadata={'language': 'json'}
-        print(template)
+        template.metadata = {'language': 'json'}
 
         return template

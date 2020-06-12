@@ -9,5 +9,6 @@ services:
     volumes:
       - ./conf:/etc/prosody
       - ./prosody_modules:/opt/modules
+#    command: "/bin/bash /etc/prosody/init_users.sh"
 volumes:
   serwer-data:
