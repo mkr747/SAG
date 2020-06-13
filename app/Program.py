@@ -1,6 +1,8 @@
 import time
-from agents.UserAgent import UserAgent
+from app.agents.UserAgent import UserAgent
 from spade import quit_spade
+import asyncio
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # python-3.8.0a4
 
 if __name__ == "__main__":
     user = UserAgent("user@localhost", "user", dataEndpoint = "data@localhost")

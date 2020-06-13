@@ -3,8 +3,8 @@ import datetime
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
-from services.MessageService import MessageService
-from models.KnnResponse import KnnResponse
+from app.services.MessageService import MessageService
+from app.models.KnnResponse import KnnResponse
 from operator import itemgetter
 
 class ValidationAgent(Agent):

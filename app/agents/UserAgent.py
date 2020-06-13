@@ -1,9 +1,10 @@
 import datetime, time
-from agents.DataAgent import DataAgent
-from services.Logger import Logger
-from services.Endpoints import Endpoints
+from app.agents.DataAgent import DataAgent
+from app.services.Logger import Logger
+from app.services.Endpoints import Endpoints
 from spade.agent import Agent
 from spade.behaviour import OneShotBehaviour
+
 
 
 class UserAgent(Agent):

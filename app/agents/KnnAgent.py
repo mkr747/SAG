@@ -1,14 +1,14 @@
 import math
 import datetime
 import pandas as pd
-from services.Logger import Logger
+from app.services.Logger import Logger
 from collections import Counter
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour, OneShotBehaviour
 from spade.template import Template
-from services.MessageService import MessageService
-from services.KnnService import KnnService
-from services.Endpoints import Endpoints
+from app.services.MessageService import MessageService
+from app.services.KnnService import KnnService
+from app.services.Endpoints import Endpoints
 
 Querying = "Querying"
 Bidding = "Bidding"
@@ -40,13 +40,15 @@ class KnnAgent(Agent):
                 return
             if msg.body == 'DONE':
                 print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
+
                 await self.agent.stop()
                 return
             # print(f'Knn {self.number} dostał {msg.body}')
             if msg and msg.metadata[PhaseTag] == Bidding:
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 self.knnService.addData(row)
-                cc = self.knnService.CalculateCenter()
+
+                cc = self.knnService.CalculateCenter(row)
                 ccResponse = self.messageService.create_message(self.creatorJid, "center", cc, self.number)
                 # print(f"Knn {self.number} chce wysłać {cc}")
                 await self.send(ccResponse)

@@ -7,11 +7,11 @@ from spade.template import Template
 from spade import quit_spade
 from mlxtend.preprocessing import minmax_scaling
 
-from services.MessageService import MessageService
-from agents.KnnAgent import KnnAgent
-from services.Endpoints import Endpoints
-from services.Logger import Logger
-from services.KnnService import KnnService
+from app.services.MessageService import MessageService
+from app.agents.KnnAgent import KnnAgent
+from app.services.Endpoints import Endpoints
+from app.services.Logger import Logger
+from app.services.KnnService import KnnService
 
 Querying = "Querying"
 Bidding = "Bidding"
@@ -49,7 +49,7 @@ class DataAgent(Agent):
             self.presence.on_subscribe = self.on_subscribe
             self.presence.on_subscribed = self.on_subscribed
             # print(f'[{datetime.datetime.now().time()}]DataAgent: Data agent run')
-            self.__get_data("..\\data\\winequality-red2.csv")
+            self.__get_data("..\\data\\winequality-white.csv")
             if self.processed_data_index < len(self.scaled_data_with_labels):
                 await self.__split_dataset()
             else:
@@ -74,12 +74,12 @@ class DataAgent(Agent):
             row = self.scaled_data_with_labels.iloc[self.processed_data_index]
             print(f'processing: { round(100 * self.processed_data_index / len(self.scaled_data))} %')
             assigned = False
-            self.threshold_data = list()
+
             if len(self.knn_agents) > 0:
-                # print(f"Threshold {KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1])}")
+                #print(f"Euclides {KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1])}")
                 self.threshold_data.append(KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]))
-                if 0 < KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.75 or self.processed_knn_agent == 20:
-                    if self.processed_knn_agent == 20:
+                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.35 or self.processed_knn_agent == 60:
+                    if self.processed_knn_agent == 60:
                         self.processed_knn_agent = self.threshold_data.index(min(self.threshold_data)) + 1
                     await self.__send_row(self.processed_knn_agent, row)
                     await self.__wait_for_center(self.processed_knn_agent)
@@ -87,6 +87,7 @@ class DataAgent(Agent):
 
                 if len(self.knn_agents) == self.processed_knn_agent or assigned:
                     self.processed_knn_agent = 1
+                    self.threshold_data = list()
                 else:
                     self.processed_knn_agent += 1
                     return
