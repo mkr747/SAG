@@ -49,7 +49,7 @@ class DataAgent(Agent):
             self.presence.on_subscribe = self.on_subscribe
             self.presence.on_subscribed = self.on_subscribed
             # print(f'[{datetime.datetime.now().time()}]DataAgent: Data agent run')
-            self.__get_data("..\\data\\winequality-white.csv")
+            self.__get_data("..\\data\\winequality-red.csv")
             if self.processed_data_index < len(self.scaled_data_with_labels):
                 await self.__split_dataset()
             else:
@@ -78,7 +78,7 @@ class DataAgent(Agent):
             if len(self.knn_agents) > 0:
                 #print(f"Euclides {KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1])}")
                 self.threshold_data.append(KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]))
-                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.35 or self.processed_knn_agent == 60:
+                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.4 or self.processed_knn_agent == 60:
                     if self.processed_knn_agent == 60:
                         self.processed_knn_agent = self.threshold_data.index(min(self.threshold_data)) + 1
                     await self.__send_row(self.processed_knn_agent, row)
@@ -126,7 +126,7 @@ class DataAgent(Agent):
 
         async def __send_end_message(self):
             for agent_index in range(self.agent_count):
-                msg = self.messageService.create_message_from_data_frame(f'knn{agent_index + 1}@localhost', Bidding, "DONE",
+                msg = self.messageService.create_message_from_data_frame(f'knn{agent_index + 1}@localhost', Querying, self.scaled_data.iloc[200].to_json(),
                                                                          agent_index)
                 await self.send(msg)
 

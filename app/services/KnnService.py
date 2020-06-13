@@ -10,8 +10,6 @@ class KnnService:
     def addData(self, row):
         self.data = self.data.append(pd.Series(row), ignore_index = True)
         self.data = self.data[row.keys()]
-        i = 5
-        a= i
 
     def clean(self):
         self.data = pd.DataFrame()
@@ -20,10 +18,10 @@ class KnnService:
         if len(self.data) <2:
             center = []
             rowNumber = 0
-            for index, row in self.data.iterrows():
-                row = row.iloc[:-1]
+            for index, roww in self.data.iterrows():
+                roww = roww.iloc[:-1]
                 columnNumber = 0
-                for element in row:
+                for element in roww:
                     if rowNumber > 0:
                         center[columnNumber] = center[columnNumber] + element
                     else:
@@ -68,14 +66,15 @@ class KnnService:
 
         rowNumber = 0
         euclidesMeasures = []
-        for row in self.data.iterrows():
-            euclidesMeasures.append(self.GetEuclidesMeasure(row[:-1], query))
+        for index, row in self.data.iterrows():
+            row = row.iloc[:-1]
+            euclidesMeasures.append(self.GetEuclidesMeasure(row, query.values()))
             rowNumber = rowNumber + 1
 
         indexes = []
         classes = []
         # liczba sasiadow
-        k= len(euclidesMeasures) - 1
+        k= 5
         for _ in range(0, k+1):
             indexOfMinValue = euclidesMeasures.index(min(euclidesMeasures))
             indexes.append(indexOfMinValue)
