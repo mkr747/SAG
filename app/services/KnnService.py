@@ -68,14 +68,14 @@ class KnnService:
         euclidesMeasures = []
         for index, row in self.data.iterrows():
             row = row.iloc[:-1]
-            euclidesMeasures.append(self.GetEuclidesMeasure(row, query.values()))
+            euclidesMeasures.append(self.GetEuclidesMeasure(row, list(query.values())))
             rowNumber = rowNumber + 1
 
         indexes = []
         classes = []
         # liczba sasiadow
         k= 5
-        for _ in range(0, k+1):
+        for _ in range(0, k):
             indexOfMinValue = euclidesMeasures.index(min(euclidesMeasures))
             indexes.append(indexOfMinValue)
             euclidesMeasures[indexOfMinValue] = max(euclidesMeasures) + 1
