@@ -105,7 +105,7 @@ class DataAgent(Agent):
             if len(self.knn_agents) > 0:
                 #print(f"Euclides {KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1])}")
                 self.threshold_data.append(KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]))
-                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.4 or self.processed_knn_agent == 60:
+                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.29 or self.processed_knn_agent == 60:
                     if self.processed_knn_agent == 60:
                         self.processed_knn_agent = self.threshold_data.index(min(self.threshold_data)) + 1
                     await self.__send_row(self.processed_knn_agent, row)

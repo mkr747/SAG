@@ -55,6 +55,7 @@ class KnnAgent(Agent):
                 return
 
             if msg and msg.metadata[PhaseTag] == Querying:
+                print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 if len(self.knnService.data) >= 5:
                     [label, weight] = self.knnService.Knn(row)

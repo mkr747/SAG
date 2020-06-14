@@ -36,7 +36,6 @@ class ValidationAgent(Agent):
                 classes = []
             return results, counter/len(results) * 100
 
-
         async def on_end(self):
             max(self.results, key=lambda knn: knn.weight)
             msg = self.messageService.create_message(self.userEndpoint, "inform", "content")
