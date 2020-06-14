@@ -58,9 +58,10 @@ class KnnAgent(Agent):
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 if len(self.knnService.data) >= 5:
                     [label, weight] = self.knnService.Knn(row)
-                    print(f'KNN {self.number} MÓWI ŻE KLASA {label}, ZA {weight}, ogólnie {len(self.knnService.data)}')
+                    #print(f'KNN {self.number} MÓWI ŻE KLASA {label}, ZA {weight}, ogólnie {len(self.knnService.data)}')
                     qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate",
                                                                    [label, weight, self.number])
+                    qResponse.set_metadata('index', msg.metadata['index'])
                     await self.send(qResponse)
                 else:
                     print(f'KNN {self.number} jest biedny w dane')
