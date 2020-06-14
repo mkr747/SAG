@@ -23,17 +23,31 @@ class ValidationAgent(Agent):
             self.query_count = None
             super().__init__()
 
-        def countResults(self):
+        def count_results(self):
             classes = []
             results = []
+            euclides = []
             counter = 0
             for key in self.knnResponse.keys():
                 for val in self.knnResponse[key]:
                     classes.append(val[0])
-                results.append(mode(classes))
+                    euclides.append(val[2])
+                print(f"KLASY {classes}")
+                multiplier = [5, 3, 2]
+                for i in range(3):
+                    indexOfMinValue = euclides.index(min(euclides))
+                    for _ in range(multiplier[i]):
+                        classes.append(self.knnResponse[key][indexOfMinValue][0])
+                    euclides[indexOfMinValue] = max(euclides) + 1
+                print(f"PO DODANIU KLAS {classes}")
+                try:
+                    results.append(mode(classes))
+                except:
+                    results.append(5)
                 if results[-1] == self.labels[key]:
                     counter += 1
                 classes = []
+                euclides = []
             return results, counter/len(results) * 100
 
         async def on_end(self):
@@ -41,7 +55,6 @@ class ValidationAgent(Agent):
             msg = self.messageService.create_message(self.userEndpoint, "inform", "content")
             await self.send(msg)
             await self.agent.stop()
-
 
         async def run(self):
             print('Val czeka')
@@ -60,15 +73,10 @@ class ValidationAgent(Agent):
                 if msg.metadata['phase'] == 'Kill':
                     self.query_count = len(self.labels)
                 if self.query_count is not None and self.query_count == len(self.knnResponse) and len(self.knnResponse[f'{self.query_count-1}']) == len(self.knnResponse['0']):
-               #     if self.query_count == len(self.knnResponse):
-               #         if len(self.knnResponse[f'{self.query_count-1}']) == len(self.knnResponse[0]):
-                    results, skutecznosc_xd = self.countResults()
+                    results, skutecznosc_xd = self.count_results()
                     print(results)
                     print(self.labels)
                     print(skutecznosc_xd)
-
-              #  self.knnResponse.append(knnResult)
-              #  self.countResults()
 
     async def setup(self):
         print(f"ValidationAgent started at {datetime.datetime.now().time()}")

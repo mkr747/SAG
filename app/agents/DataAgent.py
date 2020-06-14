@@ -53,7 +53,7 @@ class DataAgent(Agent):
             self.presence.on_subscribe = self.on_subscribe
             self.presence.on_subscribed = self.on_subscribed
             # print(f'[{datetime.datetime.now().time()}]DataAgent: Data agent run')
-            self.__get_data("..\\data\\winequality-white.csv")
+            self.__get_data("..\\data\\winequality-red.csv")
             if self.processed_data_index < len(self.scaled_data_with_labels):
                 await self.__split_dataset()
             else:
@@ -152,7 +152,7 @@ class DataAgent(Agent):
             await self.send(msg)
 
         async def __send_train_data(self):
-            self.__get_test_data("..\\data\\winequality-white-test.csv")
+            self.__get_test_data("..\\data\\winequality-red-test.csv")
             row = self.test_scaled_data.iloc[self.processed_test_data_index]
 
             for agent_index in range(self.agent_count):

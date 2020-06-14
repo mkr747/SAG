@@ -59,7 +59,7 @@ class KnnAgent(Agent):
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 if len(self.knnService.data) >= 5:
                     [label, weight] = self.knnService.Knn(row)
-                    euclides = self.knnService.GetEuclidesMeasure(self.knnService.center, row)
+                    euclides = self.knnService.GetEuclidesMeasure(self.knnService.center, list(row.values()))
                     #print(f'KNN {self.number} MÓWI ŻE KLASA {label}, ZA {weight}, ogólnie {len(self.knnService.data)}')
                     qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate",
                                                                    [label, weight, euclides, len(self.knnService.data), self.number])
