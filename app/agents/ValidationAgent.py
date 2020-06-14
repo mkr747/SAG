@@ -4,6 +4,7 @@ from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour
 from spade.message import Message
 from app.services.MessageService import MessageService
+from app.services.Logger import Logger
 from app.models.KnnResponse import KnnResponse
 from operator import itemgetter
 from statistics import mode
@@ -17,6 +18,7 @@ class ValidationAgent(Agent):
         def __init__(self, userEndpoint):
             self.userEndpoint = userEndpoint
             self.messageService = MessageService()
+            self.logger = Logger('ValidationAgent')
             self.knnResponse = dict()
             self.results = []
             self.labels = dict()
@@ -57,7 +59,7 @@ class ValidationAgent(Agent):
             await self.agent.stop()
 
         async def run(self):
-            print('Val czeka')
+            #print('Val czeka')
             msg = await self.receive(timeout=1)
             if msg is not None:
                 if msg.metadata['phase'] == 'validate':
@@ -68,7 +70,7 @@ class ValidationAgent(Agent):
                     self.knnResponse[msg.metadata["index"]].append(knnResult)
                 if msg.metadata['phase'] == 'Querying':
                     trueLabel = self.messageService.decode_message_to_dict(msg.body)
-                    print(f'Data mówi że query o indeksie {msg.metadata["index"]} ma klase: {trueLabel}')
+                    self.logger.custom_message(f'Query id: {msg.metadata["index"]}; class: {trueLabel}')
                     self.labels[msg.metadata["index"]] = trueLabel
                 if msg.metadata['phase'] == 'Kill':
                     self.query_count = len(self.labels)

@@ -99,13 +99,14 @@ class DataAgent(Agent):
 
         async def __split_dataset(self):
             row = self.scaled_data_with_labels.iloc[self.processed_data_index]
-            print(f'processing: { round(100 * self.processed_data_index / len(self.scaled_data_with_labels))} %')
+            self.logger.progress_message(self.processed_data_index / len(self.scaled_data_with_labels))
+            #print(f'processing: { round(100 * self.processed_data_index / len(self.scaled_data_with_labels))} %')
             assigned = False
 
             if len(self.knn_agents) > 0:
                 #print(f"Euclides {KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1])}")
                 self.threshold_data.append(KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]))
-                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.35 or self.processed_knn_agent == 60:
+                if KnnService.GetEuclidesMeasure(self.knn_agents[self.processed_knn_agent][center], row[:-1]) < 0.25 or self.processed_knn_agent == 60:
                     if self.processed_knn_agent == 60:
                         self.processed_knn_agent = self.threshold_data.index(min(self.threshold_data)) + 1
                     await self.__send_row(self.processed_knn_agent, row)

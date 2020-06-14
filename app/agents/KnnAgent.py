@@ -1,11 +1,11 @@
 import math
 import datetime
 import pandas as pd
-from app.services.Logger import Logger
 from collections import Counter
 from spade.agent import Agent
 from spade.behaviour import CyclicBehaviour, OneShotBehaviour
 from spade.template import Template
+from app.services.Logger import Logger
 from app.services.MessageService import MessageService
 from app.services.KnnService import KnnService
 from app.services.Endpoints import Endpoints
@@ -39,8 +39,7 @@ class KnnAgent(Agent):
             if msg is None:
                 return
             if msg.body == 'DONE':
-                print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
-
+                #print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
                 await self.agent.stop()
                 return
             # print(f'Knn {self.number} dostał {msg.body}')
@@ -55,7 +54,7 @@ class KnnAgent(Agent):
                 return
 
             if msg and msg.metadata[PhaseTag] == Querying:
-                print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
+                #print(f'KNN {self.number} CHCE ROBIĆ MASZIN LERNING! Mam {len(self.knnService.data)} danych.')
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 if len(self.knnService.data) >= 5:
                     [label, weight] = self.knnService.Knn(row)
@@ -65,8 +64,7 @@ class KnnAgent(Agent):
                                                                    [label, weight, euclides, len(self.knnService.data), self.number])
                     qResponse.set_metadata('index', msg.metadata['index'])
                     await self.send(qResponse)
-                else:
-                    print(f'KNN {self.number} jest biedny w dane')
+
                 return
 
         def on_subscribe(self, jid):

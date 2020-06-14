@@ -1,9 +1,10 @@
 import datetime, time
+from spade.behaviour import OneShotBehaviour
+from spade.agent import Agent
+
 from app.agents.DataAgent import DataAgent
 from app.services.Logger import Logger
 from app.services.Endpoints import Endpoints
-from spade.agent import Agent
-from spade.behaviour import OneShotBehaviour
 from app.agents.ValidationAgent import ValidationAgent
 
 
