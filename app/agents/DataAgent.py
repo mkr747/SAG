@@ -27,8 +27,9 @@ class DataAgent(Agent):
             self.raw_data = None
             self.data = None
             self.threshold_data = list()
-            self.scaled_data = None
+            self.norm = list()
             self.scaled_data_with_labels = None
+            self.test_data = None
             self.knn_agents = {}
             self.agent_count = 0
             self.threshold = threshold
@@ -53,7 +54,7 @@ class DataAgent(Agent):
             if self.processed_data_index < len(self.scaled_data_with_labels):
                 await self.__split_dataset()
             else:
-                await self.__send_end_message()
+                await self.__send_train_data()
                 await self.agent.stop()
 
         async def on_end(self):
@@ -64,15 +65,33 @@ class DataAgent(Agent):
                 self.raw_data = pd.read_csv(filepath, sep=",")
                 self.labels = self.raw_data[self.raw_data.columns[-1]]
                 self.data = self.raw_data.iloc[:, :-1]
-                self.scaled_data = minmax_scaling(self.data, self.data.columns)
-                self.scaled_data_with_labels = self.scaled_data.copy()
+                self.scaled_data_with_labels = self.__normalize_data(self.data)
                 self.scaled_data_with_labels['quality'] = self.labels
             except IOError as e:
                 self.logger.custom_message(f'Cannot open file. {e}')
 
+        async def __get_test_data(self, filepath):
+            try:
+                self.raw_data = pd.read_csv(filepath, sep=",")
+                self.labels = self.raw_data[self.raw_data.columns[-1]]
+                self.data = self.raw_data.iloc[:, :-1]
+                self.scaled_data_with_labels = minmax_scaling(self.data, self.data.columns)
+                self.scaled_data_with_labels['quality'] = self.labels
+            except IOError as e:
+                self.logger.custom_message(f'Cannot open file. {e}')
+
+        def __normalize_data(self, data):
+            if len(self.norm) == 0:
+                for columnName, columnData in data.iteritems():
+                    self.norm[columnName] = max(columnData)
+
+            data[:, data.columns] = (data[:, data.columns] * self.norm[data.columns])
+
+            return data
+
         async def __split_dataset(self):
             row = self.scaled_data_with_labels.iloc[self.processed_data_index]
-            print(f'processing: { round(100 * self.processed_data_index / len(self.scaled_data))} %')
+            print(f'processing: { round(100 * self.processed_data_index / len(self.scaled_data_with_labels))} %')
             assigned = False
 
             if len(self.knn_agents) > 0:
@@ -124,11 +143,12 @@ class DataAgent(Agent):
                                                                      agent_index)
             await self.send(msg)
 
-        async def __send_end_message(self):
-            for agent_index in range(self.agent_count):
-                msg = self.messageService.create_message_from_data_frame(f'knn{agent_index + 1}@localhost', Querying, self.scaled_data.iloc[200].to_json(),
-                                                                         agent_index)
-                await self.send(msg)
+        async def __send_train_data(self):
+            pass
+            #for agent_index in range(self.agent_count):
+            #    msg = self.messageService.create_message_from_data_frame(f'knn{agent_index + 1}@localhost', Querying, self.scaled_data.iloc[200].to_json(),
+            #                                                             agent_index)
+            #    await self.send(msg)
 
     def __init__(self, jid, password, threshold, verify_security=False):
         super().__init__(jid, password, verify_security)
@@ -137,13 +157,5 @@ class DataAgent(Agent):
 
     async def setup(self):
         b = self.BiddingBehav(self.threshold, self.logger)
-        template = self.data_template()
         self.add_behaviour(b)
         self.logger.agent_started()
-
-    def data_template(self):
-        template = Template()
-        template.to = f'{self.jid}'
-        template.sender = f'{Endpoints.KAGENT}'
-        template.metadata = {'phase': 'center', 'language': 'json'}
-        return template
