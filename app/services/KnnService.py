@@ -70,11 +70,12 @@ class KnnService:
             row = row.iloc[:-1]
             euclidesMeasures.append(self.GetEuclidesMeasure(row, list(query.values())))
             rowNumber = rowNumber + 1
-
+        #TODO
+        # mozna przemyslec wage, odleglosc (przykladu od centrum) powinna miec wplyw
         indexes = []
         classes = []
         # liczba sasiadow
-        k= 5
+        k = math.floor(len(self.data) * 0.2)
         for _ in range(0, k):
             indexOfMinValue = euclidesMeasures.index(min(euclidesMeasures))
             indexes.append(indexOfMinValue)
@@ -83,4 +84,4 @@ class KnnService:
 
         most_common,num_most_common = Counter(classes).most_common(1)[0]
 
-        return [most_common, num_most_common]
+        return [most_common, num_most_common/k]

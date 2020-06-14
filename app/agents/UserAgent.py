@@ -4,6 +4,7 @@ from app.services.Logger import Logger
 from app.services.Endpoints import Endpoints
 from spade.agent import Agent
 from spade.behaviour import OneShotBehaviour
+from app.agents.ValidationAgent import ValidationAgent
 
 
 
@@ -29,7 +30,10 @@ class UserAgent(Agent):
             dataAgent = DataAgent(Endpoints.DAGENT, Endpoints.PASS, threshhold)
             self.logger.agent_created("DataAgent")
             await dataAgent.start()
-            dataAgent.web.start(hostname="localhost", port="10001")
+            #dataAgent.web.start(hostname="localhost", port="10001")
+            validationAgent = ValidationAgent(Endpoints.VAGENT, Endpoints.PASS, Endpoints.UAGENT)
+            self.logger.agent_created("ValidationAgent")
+            await validationAgent.start()
             
     async def setup(self):
         self.logger.agent_started()

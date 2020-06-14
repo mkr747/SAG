@@ -38,10 +38,13 @@ class ValidationAgent(Agent):
 
 
         async def run(self):
-            msg = await self.receive(timeout=None)
-            knnResult = self.messageService.decode_message_to_object(msg)
-            self.knnResponse.append(knnResult)
-            self.countResults()
+            print('Val czeka')
+            msg = await self.receive(timeout=1)
+            if msg is not None:
+                knnResult = self.messageService.decode_message_to_dict(msg.body)
+                print(f'Val odebrał {knnResult} ')
+                self.knnResponse.append(knnResult)
+              #  self.countResults()
 
     async def setup(self):
         print(f"ValidationAgent started at {datetime.datetime.now().time()}")

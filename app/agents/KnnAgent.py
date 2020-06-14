@@ -57,11 +57,11 @@ class KnnAgent(Agent):
             if msg and msg.metadata[PhaseTag] == Querying:
                 row = self.messageService.decode_message_to_dict(message_json=msg.body)
                 if len(self.knnService.data) >= 5:
-                    [most_common, num_most_common] = self.knnService.Knn(row)
-                    print(f'KNN {self.number} MÓWI ŻE KLASA {most_common}, ZA {num_most_common}, ogólnie {len(self.knnService.data)}')
-                    # qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate",
-                    #                                               [most_common, num_most_common])
-                    #await self.send(qResponse)
+                    [label, weight] = self.knnService.Knn(row)
+                    print(f'KNN {self.number} MÓWI ŻE KLASA {label}, ZA {weight}, ogólnie {len(self.knnService.data)}')
+                    qResponse = self.messageService.create_message(Endpoints.VAGENT, "validate",
+                                                                   [label, weight, self.number])
+                    await self.send(qResponse)
                 else:
                     print(f'KNN {self.number} jest biedny w dane')
                 return
