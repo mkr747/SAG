@@ -25,9 +25,10 @@ Basic wersja: Dane trenujące, z pliku. Ewentualnie, może, jak będzie się nam
 
 #### Uruchamianie
 
-Serwer uruchamiamy za pomocą komendy `docker-compose up -d`
+Serwer Prosody XMPP uruchamiamy za pomocą komendy `docker-compose up -d`
 
-Aby Program.py działał trzeba wejść do kontenera i stworzyć użytkownika za pomocą komendy:
-`prosodyctl addusr user@localhost`
+Aby Program.py działał trzeba wejść do kontenera 
+`docker exec -it <container_name> /bin/bash` i stworzyć użytkowników za pomocą 
+komend zawartych w pliku `conf/init_users.sh`
 
 Konsola administratora jest dostępna pod `localhost:5280/admin`

@@ -87,7 +87,7 @@ class ValidationAgent(Agent):
                 try:
                     results.append(mode(classes))
                 except:
-                    results.append(5)
+                    results.append(1)
                 if results[-1] == self.labels[key]:
                     counter += 1
                 classes = []

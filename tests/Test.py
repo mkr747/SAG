@@ -42,9 +42,9 @@ class DataProvider:
 
 
 data = DataProvider()
-data.get_data(".\\data\\winequality-white.csv")
-data.get_test_data(".\\data\\winequality-white-test.csv")
-model = KNeighborsClassifier(n_neighbors=3) # Train the model using the training sets
+data.get_data(".\\data\\winequality-red.csv")
+data.get_test_data(".\\data\\winequality-red-test.csv")
+model = KNeighborsClassifier(n_neighbors=20) # Train the model using the training sets
 model.fit(data.scaled_data, data.labels) #Predict Output
 predicted= model.predict(data.test_scaled_data) # 0:Overcast, 2:Mild 
 counter = 0
