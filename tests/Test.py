@@ -1,6 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
 import pandas as pd
 
+
 class DataProvider:
     def __init__(self):
         self.norm = dict()
@@ -9,9 +10,9 @@ class DataProvider:
         self.data = None
         self.labels = None
 
-    def get_data(self, filepath):
+    def get_data(self, file_path):
         try:
-            raw_data = pd.read_csv(filepath, sep=",")
+            raw_data = pd.read_csv(file_path, sep=",")
             self.labels = raw_data[raw_data.columns[-1]]
             self.data = raw_data.iloc[:, :-1]
             self.scaled_data = self.normalize_data(self.data)
@@ -20,9 +21,9 @@ class DataProvider:
         except IOError as e:
             print(f'Cannot open file. {e}')
     
-    def get_test_data(self, filepath):
+    def get_test_data(self, file_path):
             try:
-                raw_data = pd.read_csv(filepath, sep=",")
+                raw_data = pd.read_csv(file_path, sep=",")
                 labels = raw_data[raw_data.columns[-1]]
                 data = raw_data.iloc[:, :-1]
                 self.test_scaled_data = self.normalize_data(data)
